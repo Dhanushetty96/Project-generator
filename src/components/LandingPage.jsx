@@ -11,6 +11,7 @@ import {
     Users,
     ArrowRight,
 } from "lucide-react";
+import Link from "next/link";
 
 export default function LandingPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -162,9 +163,12 @@ export default function LandingPage() {
 
                     {/* Hero CTA Buttons */}
                     <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-                        <button className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium">
+                        <Link
+                            href={"/template/create"}
+                            className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium"
+                        >
                             Start Building <ChevronRight size={20} />
-                        </button>
+                        </Link>
                         <button className="flex items-center justify-center gap-2 bg-white text-indigo-600 border border-indigo-600 px-8 py-3 rounded-lg hover:bg-indigo-50 font-medium">
                             Watch Demo
                         </button>

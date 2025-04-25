@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Search,
     Layers,
@@ -15,6 +15,7 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchTemplates } from "@/app/store/templateSlice";
 import { processCodeWithVariables } from "@/lib/helpers";
+import { Editor } from "@monaco-editor/react";
 
 export default function LandingPage() {
     const [searchQuery, setSearchQuery] = useState("");
@@ -22,6 +23,9 @@ export default function LandingPage() {
     const { templates, loading, error } = useSelector(
         (state) => state.template
     );
+    const [typedText, setTypedText] = useState("");
+    const [isTyping, setIsTyping] = useState(false);
+    const previewRef = useRef(null);
 
     // Fetch on mount
     useEffect(() => {
@@ -66,6 +70,77 @@ export default function LandingPage() {
                 "The templates are beautiful and customizing them was super intuitive.",
         },
     ];
+
+    // Sample HTML code to type (using Tailwind)
+    const sampleCode = `<div class="bg-white rounded-xl shadow-lg p-8 max-w-md text-center transition-transform duration-300 hover:-translate-y-1">
+    <h1 class="text-2xl font-bold text-gray-800 mb-4">Welcome to TailwindCSS</h1>
+    <p class="text-gray-600 mb-6">Build beautifully designed websites with utility-first CSS</p>
+    <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-medium px-6 py-3 rounded-md transition-colors duration-200">
+    Get Started
+    </a>
+</div>`;
+
+    useEffect(() => {
+        // Start typing after a short delay
+        setTimeout(() => startTyping(), 1000);
+    }, []);
+
+    useEffect(() => {
+        // Update the preview iframe with the current typed text
+        if (previewRef.current) {
+            const frameDoc =
+                previewRef.current.contentDocument ||
+                previewRef.current.contentWindow.document;
+            frameDoc.open();
+            frameDoc.write(`
+                <html>
+                    <head>
+                        <script src="https://cdn.tailwindcss.com"></script>
+                    </head>
+                    <body class="flex items-center justify-center min-h-screen bg-gray-100">
+                        ${typedText}
+                    </body>
+                </html>
+            `);
+            frameDoc.close();
+        }
+    }, [typedText]);
+
+    // Function to start the typing animation
+    const startTyping = () => {
+        setIsTyping(true);
+        let i = 0;
+        let currentText = "";
+
+        const typeNextChar = () => {
+            if (i < sampleCode.length) {
+                const char = sampleCode.charAt(i);
+                currentText += char;
+                setTypedText(currentText);
+
+                i++;
+
+                // Adjust typing speed based on character
+                let typingSpeed = 50;
+                if (char === "\n" || char === ">") {
+                    typingSpeed = 200;
+                } else if (char === " ") {
+                    typingSpeed = 30;
+                }
+
+                setTimeout(typeNextChar, typingSpeed);
+            } else {
+                setIsTyping(false);
+                // Loop again after a longer pause
+                setTimeout(() => {
+                    setTypedText("");
+                    startTyping();
+                }, 3000);
+            }
+        };
+
+        typeNextChar();
+    };
 
     return (
         <div className="min-h-screen text-black bg-gradient-to-b from-indigo-50 to-white">
@@ -163,9 +238,37 @@ export default function LandingPage() {
                             <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
                             <div className="w-3 h-3 rounded-full bg-green-400"></div>
                         </div>
-                        <div className="p-6 bg-gray-800 h-96 flex items-center justify-center">
-                            <div className="text-white text-xl font-light">
-                                [Website Builder Interface Preview]
+                        <div className="p-6 bg-gray-800 h-96 items-center justify-center grid grid-cols-2">
+                            <div className="flex-1 h-full border-r border-gray-700 bg-gray-800 relative">
+                                <div className="h-full w-full font-mono text-sm leading-relaxed p-4 text-gray-300 whitespace-pre overflow-auto bg-gray-800">
+                                    <Editor
+                                        height="320px"
+                                        defaultLanguage="html"
+                                        theme="vs-dark"
+                                        className="rounded-md"
+                                        value={typedText}
+                                        options={{
+                                            minimap: { enabled: false },
+                                            automaticLayout: true,
+                                            formatOnPaste: true,
+                                            formatOnType: true,
+                                            scrollBeyondLastLine: false,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex-1 h-full bg-gray-800 flex flex-col">
+                                {/* <div className="py-2 px-3 bg-gray-750 border-b border-gray-700 text-xs text-gray-400 flex items-center">
+                                    <span className="mr-2">▶</span> Live Preview
+                                </div> */}
+                                <div className="flex-1 p-3 overflow-hidden">
+                                    <iframe
+                                        ref={previewRef}
+                                        className="w-full h-full rounded border-none bg-white"
+                                        title="Preview"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -269,7 +372,7 @@ export default function LandingPage() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
                         {filteredTemplates.map((template) => (
                             <div
-                                key={template.id}
+                                key={template._id}
                                 className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
                             >
                                 <div className="h-48 bg-gray-100 flex items-center justify-center">

@@ -28,3 +28,38 @@ body {
     color: var(--foreground);
     font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes blink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0;
+    }
+}
+.editor-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 18px;
+    background-color: #fff;
+    animation: blink 1s step-end infinite;
+    vertical-align: bottom;
+    margin-bottom: 1px;
+}
+.syntax-html {
+    color: #e06c75;
+}
+.syntax-attr {
+    color: #d19a66;
+}
+.syntax-string {
+    color: #98c379;
+}
+.syntax-comment {
+    color: #5c6370;
+    font-style: italic;
+}
+.syntax-tag {
+    color: #61afef;
+}

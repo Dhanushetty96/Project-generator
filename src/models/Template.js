@@ -8,7 +8,7 @@ const VariableSchema = new mongoose.Schema({
 
 const TemplateSchema = new mongoose.Schema({
     templateName: String,
-    jsxCode: String,
+    code: String,
     templateType: String,
     variables: [VariableSchema],
 });

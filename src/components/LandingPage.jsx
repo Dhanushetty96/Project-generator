@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Search,
     Layers,
@@ -12,53 +12,35 @@ import {
     ArrowRight,
 } from "lucide-react";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchTemplates } from "@/app/store/templateSlice";
+import { processCodeWithVariables } from "@/lib/helpers";
 
 export default function LandingPage() {
     const [searchQuery, setSearchQuery] = useState("");
+    const dispatch = useDispatch();
+    const { templates, loading, error } = useSelector(
+        (state) => state.template
+    );
 
-    const templates = [
-        {
-            id: 1,
-            name: "Portfolio Pro",
-            category: "portfolio",
-            popularity: "trending",
-        },
-        {
-            id: 2,
-            name: "Business Plus",
-            category: "business",
-            popularity: "new",
-        },
-        {
-            id: 3,
-            name: "Creative Studio",
-            category: "creative",
-            popularity: "popular",
-        },
-        {
-            id: 4,
-            name: "E-commerce Starter",
-            category: "ecommerce",
-            popularity: "popular",
-        },
-        {
-            id: 5,
-            name: "Blog Master",
-            category: "blog",
-            popularity: "trending",
-        },
-        {
-            id: 6,
-            name: "Personal CV",
-            category: "portfolio",
-            popularity: "new",
-        },
-    ];
+    // Fetch on mount
+    useEffect(() => {
+        dispatch(fetchTemplates());
+    }, [dispatch]);
+
+    // Manual refetch trigger
+    const refetchTemplates = () => {
+        dispatch(fetchTemplates());
+    };
 
     const filteredTemplates = templates.filter(
         (template) =>
-            template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            template.category.toLowerCase().includes(searchQuery.toLowerCase())
+            template.templateName
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase()) ||
+            template.templateType
+                .toLowerCase()
+                .includes(searchQuery.toLowerCase())
     );
 
     const testimonials = [
@@ -86,7 +68,7 @@ export default function LandingPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-indigo-50 to-white">
+        <div className="min-h-screen text-black bg-gradient-to-b from-indigo-50 to-white">
             {/* Navigation */}
             <nav className="bg-white shadow-sm px-6 py-4">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
@@ -291,14 +273,40 @@ export default function LandingPage() {
                                 className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow"
                             >
                                 <div className="h-48 bg-gray-100 flex items-center justify-center">
-                                    <div className="text-gray-400">
-                                        [Template Preview]
+                                    <div className="relative w-full h-full overflow-hidden">
+                                        <iframe
+                                            srcDoc={`
+                                                <html>
+                                                    <head>
+                                                        <script src="https://cdn.tailwindcss.com"></script>
+                                                        <style>
+                                                            html, body { 
+                                                                margin: 0; 
+                                                                padding: 0;
+                                                                overflow: hidden;
+                                                            }
+                                                        </style>
+                                                    </head>
+                                                    <body class="">
+                                                        ${processCodeWithVariables(
+                                                            template.code,
+                                                            template.variables
+                                                        )}
+                                                    </body>
+                                                </html>
+                                            `}
+                                            className="absolute top-0 left-0 transform scale-50 origin-top-left"
+                                            style={{
+                                                width: "200%",
+                                                height: "200%",
+                                            }}
+                                        />
                                     </div>
                                 </div>
                                 <div className="p-6">
                                     <div className="flex justify-between items-center mb-3">
                                         <h3 className="font-semibold text-lg">
-                                            {template.name}
+                                            {template.templateName}
                                         </h3>
                                         {template.popularity === "trending" && (
                                             <span className="bg-orange-100 text-orange-600 text-xs px-2 py-1 rounded">
@@ -317,7 +325,7 @@ export default function LandingPage() {
                                         )}
                                     </div>
                                     <p className="text-gray-500 text-sm mb-4 capitalize">
-                                        {template.category}
+                                        {template.templateType}
                                     </p>
                                     <button className="text-indigo-600 font-medium hover:text-indigo-800 flex items-center">
                                         Use This Template{" "}

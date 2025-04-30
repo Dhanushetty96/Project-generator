@@ -81,25 +81,42 @@ export default function LandingPage() {
 </div>`;
 
     useEffect(() => {
-        // Start typing after a short delay
-        setTimeout(() => startTyping(), 1000);
-    }, []);
-
-    useEffect(() => {
-        // Update the preview iframe with the current typed text
+        // Initialize the iframe once
         if (previewRef.current) {
             const frameDoc =
                 previewRef.current.contentDocument ||
                 previewRef.current.contentWindow.document;
+
             frameDoc.open();
             frameDoc.write(`
-                <html>
-                    <body class="flex items-center justify-center min-h-screen bg-gray-100">
-                        ${typedText}
-                    </body>
-                </html>
-            `);
+            <html>
+                <head>
+                    <script src="https://cdn.tailwindcss.com"></script>
+                </head>
+                <body class="flex items-center justify-center min-h-screen bg-gray-100">
+                    <div id="content-container"></div>
+                </body>
+            </html>
+        `);
             frameDoc.close();
+        }
+
+        // Start typing after initialization and a short delay
+        setTimeout(() => startTyping(), 1000);
+    }, []);
+
+    useEffect(() => {
+        // Only update the content, not the entire document
+        if (previewRef.current) {
+            const frameDoc =
+                previewRef.current.contentDocument ||
+                previewRef.current.contentWindow.document;
+
+            const contentContainer =
+                frameDoc.getElementById("content-container");
+            if (contentContainer) {
+                contentContainer.innerHTML = typedText;
+            }
         }
     }, [typedText]);
 
@@ -378,6 +395,7 @@ export default function LandingPage() {
                                             srcDoc={`
                                                 <html>
                                                     <head>
+                                                        <script src="https://cdn.tailwindcss.com"></script>
                                                         <style>
                                                             html, body { 
                                                                 margin: 0; 

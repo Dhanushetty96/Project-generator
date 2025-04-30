@@ -231,9 +231,6 @@ const CodeEditorWithPreview = () => {
                         <iframe
                             srcDoc={`
                                 <html>
-                                    <head>
-                                        <script src="https://cdn.tailwindcss.com"></script>
-                                    </head>
                                     <body class="">
                                         ${processCodeWithVariables()}
                                     </body>

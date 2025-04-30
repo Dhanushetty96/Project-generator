@@ -94,9 +94,6 @@ export default function LandingPage() {
             frameDoc.open();
             frameDoc.write(`
                 <html>
-                    <head>
-                        <script src="https://cdn.tailwindcss.com"></script>
-                    </head>
                     <body class="flex items-center justify-center min-h-screen bg-gray-100">
                         ${typedText}
                     </body>
@@ -381,7 +378,6 @@ export default function LandingPage() {
                                             srcDoc={`
                                                 <html>
                                                     <head>
-                                                        <script src="https://cdn.tailwindcss.com"></script>
                                                         <style>
                                                             html, body { 
                                                                 margin: 0; 

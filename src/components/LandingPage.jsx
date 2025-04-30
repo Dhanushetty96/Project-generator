@@ -430,13 +430,16 @@ export default function LandingPage() {
                                     <p className="text-gray-500 text-sm mb-4 capitalize">
                                         {template.templateType}
                                     </p>
-                                    <button className="text-indigo-600 font-medium hover:text-indigo-800 flex items-center">
+                                    <Link
+                                        href={`/template/view/${template._id}`}
+                                        className="text-indigo-600 font-medium hover:text-indigo-800 flex items-center"
+                                    >
                                         Use This Template{" "}
                                         <ArrowRight
                                             size={16}
                                             className="ml-1"
                                         />
-                                    </button>
+                                    </Link>
                                 </div>
                             </div>
                         ))}
